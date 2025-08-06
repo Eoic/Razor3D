@@ -2,6 +2,8 @@
 
 A modern, production-ready TypeScript & Vite starter template with comprehensive tooling for front-end development.
 
+<img src="./public/preview.gif" alt="Preview of the template page" style="max-width: 800px; margin: 0 auto;" />
+
 ## Features
 
 - **Vite** - build tool with HMR.
