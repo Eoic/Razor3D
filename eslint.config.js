@@ -1,11 +1,21 @@
 import eslint from '@eslint/js';
+import stylistic from '@stylistic/eslint-plugin';
+import prettier from 'eslint-config-prettier';
+import importPlugin from 'eslint-plugin-import';
+import prettierPlugin from 'eslint-plugin-prettier';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
     eslint.configs.recommended,
-    ...tseslint.configs.recommendedTypeChecked,
+    ...tseslint.configs.strictTypeChecked,
+    prettier,
     {
-        files: ['**/*.ts'],
+        files: ['**/*.{ts,tsx}'],
+        plugins: {
+            prettier: prettierPlugin,
+            import: importPlugin,
+            '@stylistic': stylistic,
+        },
         languageOptions: {
             parserOptions: {
                 project: './tsconfig.eslint.json',
@@ -13,32 +23,54 @@ export default tseslint.config(
             },
         },
         rules: {
-            'no-unused-vars': 'off',
-            curly: ['error', 'multi'],
-            quotes: ['error', 'single'],
-            indent: ['error', 4],
-            'max-len': ['error', 120],
-            'semi': ['error', 'always'],
-            'eol-last': ['error', 'always'],
-            'comma-dangle': ["error", {
-                "arrays": "never",
-                "objects": "always",
-                "imports": "never",
-                "exports": "never",
-                "functions": "never"
-            }],
+            'prettier/prettier': 'error',
             '@typescript-eslint/no-unused-vars': [
-                'warn',
+                'error',
                 {
                     argsIgnorePattern: '^_',
                     varsIgnorePattern: '^_',
                     caughtErrorsIgnorePattern: '^_',
                 },
             ],
+            'curly': ['error', 'all'],
+            '@stylistic/semi': 'error',
+            '@typescript-eslint/explicit-function-return-type': 'off',
+            '@typescript-eslint/explicit-module-boundary-types': 'off',
+            '@typescript-eslint/no-explicit-any': 'warn',
+            '@typescript-eslint/no-inferrable-types': 'error',
+            'import/order': [
+                'error',
+                {
+                    groups: [
+                        'builtin',
+                        'external',
+                        'internal',
+                        'parent',
+                        'sibling',
+                        'index',
+                    ],
+                    'newlines-between': 'always',
+                    alphabetize: {
+                        order: 'asc',
+                        caseInsensitive: true,
+                    },
+                },
+            ],
+            'import/no-duplicates': 'error',
+            'import/no-unresolved': 'off',
+            'no-console': 'warn',
+            'no-debugger': 'error',
+            'prefer-const': 'error',
+            'no-var': 'error',
+            'object-shorthand': 'error',
+            'prefer-arrow-callback': 'error',
         },
     },
     {
         files: ['**/*.js'],
         ...tseslint.configs.disableTypeChecked,
     },
+    {
+        ignores: ['dist/', 'node_modules/', 'coverage/'],
+    }
 );

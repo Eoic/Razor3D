@@ -1,3 +1,4 @@
+import { setupApp } from '@/utils/app';
 import '../styles/main.scss';
 
-console.log('It works!');
+setupApp();
