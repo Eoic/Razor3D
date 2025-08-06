@@ -39,7 +39,6 @@ body {
   max-width: $max-width;
   margin: 0 auto;
   padding: $spacing-lg;
-  text-align: center;
   width: 100%;
 }
 
@@ -58,6 +57,7 @@ h1 {
   margin: $spacing-md 0;
   color: $color-text-primary;
   border: 1px solid $color-border-primary;
+  width: fit-content;
 }
 
 button {
@@ -70,20 +70,16 @@ button {
   font-family: inherit;
   color: $color-text-inverse;
   cursor: pointer;
-
-  // Remove default button styles
-  &:focus {
-    outline: none;
-  }
 }
 
-// Additional button variants for theme demonstration
+// Additional button variants for theme demo.
 .button-secondary {
   @include interactive-states(
     $base-bg: $color-bg-secondary,
     $hover-bg: $color-bg-tertiary,
     $focus-color: $color-border-focus
   );
+
   color: $color-text-primary;
   border: 1px solid $color-border-primary;
 }
@@ -98,7 +94,7 @@ button {
   }
 }
 
-// Theme-aware form elements
+// Theme-aware form elements.
 input,
 textarea,
 select {
@@ -120,7 +116,7 @@ select {
   }
 }
 
-// Theme-aware code blocks
+// Theme-aware code blocks.
 code,
 pre {
   background-color: $color-bg-secondary;
@@ -146,7 +142,7 @@ pre {
   }
 }
 
-// Links with theme support
+// Links with theme support.
 a {
   color: $color-primary;
   text-decoration: none;
@@ -162,16 +158,105 @@ a {
   }
 }
 
-// Dividers
+// Dividers.
 hr {
   border: none;
   border-top: 1px solid $color-border-primary;
   margin: $spacing-lg 0;
 }
 
-// Theme demonstration text
-.read-the-docs {
-  color: $color-text-secondary;
-  font-size: $font-size-sm;
-  margin-top: $spacing-lg;
+// Positioning.
+.center {
+  margin: 0 auto;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.text-left {
+  text-align: left;
+}
+
+// List styling.
+ul {
+  list-style: disc;
+  padding-left: $spacing-lg;
+  margin: $spacing-sm 0;
+
+  ul {
+    list-style: circle;
+    margin: $spacing-xs 0;
+
+    ul {
+      list-style: square;
+    }
+  }
+}
+
+ol {
+  list-style: decimal;
+  padding-left: $spacing-lg;
+  margin: $spacing-sm 0;
+
+  ol {
+    list-style: lower-alpha;
+    margin: $spacing-xs 0;
+
+    ol {
+      list-style: lower-roman;
+    }
+  }
+}
+
+li {
+  margin: $spacing-xs 0;
+  color: $color-text-primary;
+  line-height: $line-height-base;
+
+  &::marker {
+    color: $color-text-secondary;
+  }
+}
+
+.list-unstyled {
+  list-style: none;
+  padding-left: 0;
+
+  li {
+    margin: 0;
+  }
+}
+
+.list-inline {
+  list-style: none;
+  padding-left: 0;
+  display: flex;
+  flex-wrap: wrap;
+  gap: $spacing-sm;
+
+  li {
+    margin: 0;
+  }
+}
+
+.list-spaced {
+  li {
+    margin: $spacing-sm 0;
+  }
+}
+
+.list-compact {
+  li {
+    margin: 0;
+  }
+}
+
+// Spacing.
+.mt-xs {
+  margin-top: $spacing-xs;
+}
+
+.mt-sm {
+  margin-top: $spacing-sm;
 }

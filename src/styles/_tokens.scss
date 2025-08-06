@@ -1,5 +1,4 @@
 :root {
-  // Theme-agnostic design tokens
   --color-primary: #646cff;
   --color-primary-hover: #535bf2;
   --color-secondary: #f9f9f9;
@@ -8,7 +7,6 @@
   --color-warning: #ffd43b;
   --color-error: #ff6b6b;
 
-  // Layout tokens
   --max-width: 1280px;
   --border-radius: 8px;
   --border-radius-sm: 4px;
@@ -19,7 +17,6 @@
   --spacing-lg: 2rem;
   --spacing-xl: 3rem;
 
-  // Typography tokens
   --font-family-base: Inter, system-ui, Avenir, Helvetica, Arial, sans-serif;
   --font-family-mono: 'SF Mono', Monaco, 'Cascadia Code', 'Roboto Mono', Consolas, monospace;
   --font-size-xs: 0.75rem;
@@ -39,7 +36,6 @@
   --font-weight-semibold: 600;
   --font-weight-bold: 700;
 
-  // Animation tokens
   --transition-fast: 0.15s ease;
   --transition-normal: 0.3s ease;
   --transition-slow: 0.5s ease;
@@ -47,7 +43,6 @@
   --ease-out: cubic-bezier(0, 0, 0.2, 1);
   --ease-in: cubic-bezier(0.4, 0, 1, 1);
 
-  // Z-index tokens
   --z-dropdown: 1000;
   --z-sticky: 1020;
   --z-fixed: 1030;
@@ -56,9 +51,8 @@
   --z-popover: 1060;
   --z-tooltip: 1070;
 }
-// Theme-specific semantic color tokens
+
 :root {
-  // Default theme (light)
   --color-bg-primary: #ffffff;
   --color-bg-secondary: #f8f9fa;
   --color-bg-tertiary: #e9ecef;
@@ -78,14 +72,12 @@
   --color-surface-raised: #ffffff;
   --color-surface-sunken: #f8f9fa;
 
-  // Light theme shadows
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.1), 0 2px 4px -1px rgba(0, 0, 0, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
 }
 
-// Dark theme
 [data-theme='dark'] {
   --color-bg-primary: #1a1a1a;
   --color-bg-secondary: #242424;
@@ -96,7 +88,7 @@
   --color-text-primary: #ffffff;
   --color-text-secondary: rgba(255, 255, 255, 0.87);
   --color-text-tertiary: rgba(255, 255, 255, 0.6);
-  --color-text-inverse: #1a1a1a;
+  --color-text-inverse: #ebebeb;
   --color-text-muted: rgba(255, 255, 255, 0.5);
 
   --color-border-primary: #404040;
@@ -106,14 +98,12 @@
   --color-surface-raised: #242424;
   --color-surface-sunken: #1a1a1a;
 
-  // Dark theme shadows
   --shadow-sm: 0 1px 2px 0 rgba(0, 0, 0, 0.3);
   --shadow-md: 0 4px 6px -1px rgba(0, 0, 0, 0.4), 0 2px 4px -1px rgba(0, 0, 0, 0.3);
   --shadow-lg: 0 10px 15px -3px rgba(0, 0, 0, 0.4), 0 4px 6px -2px rgba(0, 0, 0, 0.3);
   --shadow-xl: 0 20px 25px -5px rgba(0, 0, 0, 0.5), 0 10px 10px -5px rgba(0, 0, 0, 0.4);
 }
 
-// Auto theme based on system preference
 @media (prefers-color-scheme: dark) {
   :root:not([data-theme]) {
     --color-bg-primary: #1a1a1a;
@@ -125,7 +115,7 @@
     --color-text-primary: #ffffff;
     --color-text-secondary: rgba(255, 255, 255, 0.87);
     --color-text-tertiary: rgba(255, 255, 255, 0.6);
-    --color-text-inverse: #1a1a1a;
+    --color-text-inverse: #ebebeb;
     --color-text-muted: rgba(255, 255, 255, 0.5);
 
     --color-border-primary: #404040;

@@ -1,6 +1,6 @@
-// SCSS variables that map to CSS custom properties for semantic theming
+// SCSS variables that map to CSS custom properties for semantic theming.
 
-// Core colors
+// Core colors.
 $color-primary: var(--color-primary);
 $color-primary-hover: var(--color-primary-hover);
 $color-secondary: var(--color-secondary);
@@ -9,30 +9,30 @@ $color-success: var(--color-success);
 $color-warning: var(--color-warning);
 $color-error: var(--color-error);
 
-// Semantic background colors
+// Semantic background colors.
 $color-bg-primary: var(--color-bg-primary);
 $color-bg-secondary: var(--color-bg-secondary);
 $color-bg-tertiary: var(--color-bg-tertiary);
 $color-bg-inverse: var(--color-bg-inverse);
 $color-bg-overlay: var(--color-bg-overlay);
 
-// Semantic text colors
+// Semantic text colors.
 $color-text-primary: var(--color-text-primary);
 $color-text-secondary: var(--color-text-secondary);
 $color-text-tertiary: var(--color-text-tertiary);
 $color-text-inverse: var(--color-text-inverse);
 $color-text-muted: var(--color-text-muted);
 
-// Border colors
+// Border colors.
 $color-border-primary: var(--color-border-primary);
 $color-border-secondary: var(--color-border-secondary);
 $color-border-focus: var(--color-border-focus);
 
-// Surface colors
+// Surface colors.
 $color-surface-raised: var(--color-surface-raised);
 $color-surface-sunken: var(--color-surface-sunken);
 
-// Layout
+// Layout.
 $max-width: var(--max-width);
 $border-radius: var(--border-radius);
 $border-radius-sm: var(--border-radius-sm);
@@ -43,7 +43,7 @@ $spacing-md: var(--spacing-md);
 $spacing-lg: var(--spacing-lg);
 $spacing-xl: var(--spacing-xl);
 
-// Typography
+// Typography.
 $font-family-base: var(--font-family-base);
 $font-family-mono: var(--font-family-mono);
 $font-size-xs: var(--font-size-xs);
@@ -63,7 +63,7 @@ $font-weight-medium: var(--font-weight-medium);
 $font-weight-semibold: var(--font-weight-semibold);
 $font-weight-bold: var(--font-weight-bold);
 
-// Animations
+// Animations.
 $transition-fast: var(--transition-fast);
 $transition-normal: var(--transition-normal);
 $transition-slow: var(--transition-slow);
@@ -71,13 +71,13 @@ $ease-in-out: var(--ease-in-out);
 $ease-out: var(--ease-out);
 $ease-in: var(--ease-in);
 
-// Shadows
+// Shadows.
 $shadow-sm: var(--shadow-sm);
 $shadow-md: var(--shadow-md);
 $shadow-lg: var(--shadow-lg);
 $shadow-xl: var(--shadow-xl);
 
-// Z-index
+// Z-index.
 $z-dropdown: var(--z-dropdown);
 $z-sticky: var(--z-sticky);
 $z-fixed: var(--z-fixed);

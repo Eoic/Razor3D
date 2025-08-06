@@ -1,17 +1,17 @@
 // Theme utilities and mixins
 
-// Mixin for smooth theme transitions
+// Mixin for smooth theme transitions.
 @mixin theme-transition($properties: all, $duration: var(--transition-normal)) {
   transition: #{$properties} #{$duration};
 }
 
-// Mixin for theme-aware focus states
+// Mixin for theme-aware focus states.
 @mixin focus-ring($color: var(--color-border-focus), $width: 2px, $offset: 2px) {
   outline: #{$width} solid #{$color};
   outline-offset: #{$offset};
 }
 
-// Mixin for elevated surfaces
+// Mixin for elevated surfaces.
 @mixin surface-elevation($level: 1) {
   @if $level == 1 {
     background-color: var(--color-surface-raised);
@@ -28,7 +28,7 @@
   }
 }
 
-// Mixin for interactive states
+// Mixin for interactive states.
 @mixin interactive-states(
   $base-bg: var(--color-primary),
   $hover-bg: var(--color-primary-hover),
@@ -46,10 +46,6 @@
     @include focus-ring($focus-color);
   }
 
-  &:active {
-    transform: translateY(1px);
-  }
-
   &:disabled {
     opacity: 0.6;
     cursor: not-allowed;
@@ -61,12 +57,12 @@
   }
 }
 
-// Utility class for theme transitions
+// Utility class for theme transitions.
 .theme-transition {
   @include theme-transition();
 }
 
-// Utility classes for different surface elevations
+// Utility classes for different surface elevations.
 .surface-flat {
   background-color: var(--color-bg-primary);
 }
@@ -87,7 +83,7 @@
   @include surface-elevation(4);
 }
 
-// Text color utilities
+// Text color utilities.
 .text-primary {
   color: var(--color-text-primary);
 }
@@ -108,7 +104,7 @@
   color: var(--color-text-inverse);
 }
 
-// Background color utilities
+// Background color utilities.
 .bg-primary {
   background-color: var(--color-bg-primary);
 }
@@ -129,7 +125,7 @@
   background-color: var(--color-surface-sunken);
 }
 
-// Border utilities
+// Border utilities.
 .border-primary {
   border: 1px solid var(--color-border-primary);
 }

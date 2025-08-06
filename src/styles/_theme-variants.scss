@@ -1,27 +1,23 @@
 // Theme configuration and additional theme variants
 
-// Blue theme variant
 [data-theme='blue'] {
   --color-primary: #0066cc;
   --color-primary-hover: #0052a3;
   --color-accent: #00aaff;
 }
 
-// Green theme variant
 [data-theme='green'] {
   --color-primary: #059669;
   --color-primary-hover: #047857;
   --color-accent: #10b981;
 }
 
-// Purple theme variant
 [data-theme='purple'] {
   --color-primary: #7c3aed;
   --color-primary-hover: #6d28d9;
   --color-accent: #8b5cf6;
 }
 
-// High contrast theme for accessibility
 [data-theme='high-contrast'] {
   --color-bg-primary: #000000;
   --color-bg-secondary: #1a1a1a;
@@ -45,14 +41,12 @@
   --color-surface-raised: #1a1a1a;
   --color-surface-sunken: #000000;
 
-  // High contrast shadows
   --shadow-sm: 0 1px 3px 0 rgba(255, 255, 255, 0.1);
   --shadow-md: 0 4px 6px -1px rgba(255, 255, 255, 0.1), 0 2px 4px -1px rgba(255, 255, 255, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(255, 255, 255, 0.1), 0 4px 6px -2px rgba(255, 255, 255, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(255, 255, 255, 0.1), 0 10px 10px -5px rgba(255, 255, 255, 0.04);
 }
 
-// Sepia theme for reduced eye strain
 [data-theme='sepia'] {
   --color-bg-primary: #f4f1ea;
   --color-bg-secondary: #eae6dd;
@@ -76,14 +70,12 @@
   --color-surface-raised: #eae6dd;
   --color-surface-sunken: #e0dbd0;
 
-  // Sepia shadows
   --shadow-sm: 0 1px 2px 0 rgba(45, 43, 38, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(45, 43, 38, 0.1), 0 2px 4px -1px rgba(45, 43, 38, 0.06);
   --shadow-lg: 0 10px 15px -3px rgba(45, 43, 38, 0.1), 0 4px 6px -2px rgba(45, 43, 38, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(45, 43, 38, 0.1), 0 10px 10px -5px rgba(45, 43, 38, 0.04);
 }
 
-// OLED dark theme (pure black for OLED displays)
 [data-theme='oled'] {
   --color-bg-primary: #000000;
   --color-bg-secondary: #0a0a0a;
@@ -104,14 +96,12 @@
   --color-surface-raised: #0a0a0a;
   --color-surface-sunken: #000000;
 
-  // Minimal shadows for OLED
   --shadow-sm: 0 1px 2px 0 rgba(255, 255, 255, 0.05);
   --shadow-md: 0 4px 6px -1px rgba(255, 255, 255, 0.1), 0 2px 4px -1px rgba(255, 255, 255, 0.05);
   --shadow-lg: 0 10px 15px -3px rgba(255, 255, 255, 0.1), 0 4px 6px -2px rgba(255, 255, 255, 0.05);
   --shadow-xl: 0 20px 25px -5px rgba(255, 255, 255, 0.1), 0 10px 10px -5px rgba(255, 255, 255, 0.04);
 }
 
-// Reduced motion preferences
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.01ms !important;
@@ -121,7 +111,6 @@
   }
 }
 
-// High contrast mode support
 @media (prefers-contrast: high) {
   :root {
     --color-border-primary: currentColor;
