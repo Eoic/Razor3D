@@ -1,20 +1,39 @@
-import { BufferGeometry, Color, Group, Material, Mesh, MeshPhysicalMaterial, Vector3 } from 'three';
+import {
+  BufferAttribute,
+  BufferGeometry,
+  Color,
+  DoubleSide,
+  Group,
+  Material,
+  Mesh,
+  MeshPhysicalMaterial,
+  ShaderMaterial,
+  Vector3,
+} from 'three';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
+
+import type { ModelViewMode } from './modelViewMode';
 
 const MODEL_URL = '/models/example.stl';
 const MODEL_TARGET_HEIGHT = 2.2;
 const MODEL_TARGET_SPAN = 2.6;
+const DEFAULT_VIEW_MODE: ModelViewMode = 'solid';
 
 export interface ExampleModel {
   group: Group;
   dispose(): void;
+  setViewMode(viewMode: ModelViewMode): void;
   update(elapsedTime: number): void;
 }
 
-export function createExampleModel(): ExampleModel {
+export function createExampleModel(initialViewMode: ModelViewMode = DEFAULT_VIEW_MODE): ExampleModel {
   const group = new Group();
   const disposableResources: Array<{ dispose(): void }> = [];
   let disposed = false;
+  let mesh: Mesh<BufferGeometry, Material> | null = null;
+  let solidMaterial: MeshPhysicalMaterial | null = null;
+  let wireframeMaterial: ShaderMaterial | null = null;
+  let viewMode = initialViewMode;
 
   const loader = new STLLoader();
 
@@ -26,12 +45,16 @@ export function createExampleModel(): ExampleModel {
         return;
       }
 
-      const mesh = createLoadedModel(geometry);
+      const loadedModel = createLoadedModel(geometry);
+      mesh = loadedModel.mesh;
+      solidMaterial = loadedModel.solidMaterial;
+      wireframeMaterial = loadedModel.wireframeMaterial;
 
       group.add(mesh);
+      applyViewMode(mesh, viewMode, solidMaterial, wireframeMaterial);
 
       disposableResources.push(mesh.geometry);
-      trackMaterialDisposables(disposableResources, mesh.material);
+      trackMaterialDisposables(disposableResources, solidMaterial, wireframeMaterial);
     })
     .catch((error: unknown) => {
       console.error(`Failed to load STL model from ${MODEL_URL}.`, error);
@@ -44,6 +67,13 @@ export function createExampleModel(): ExampleModel {
 
       for (const resource of disposableResources) {
         resource.dispose();
+      }
+    },
+    setViewMode(nextViewMode: ModelViewMode): void {
+      viewMode = nextViewMode;
+
+      if (mesh && solidMaterial && wireframeMaterial) {
+        applyViewMode(mesh, viewMode, solidMaterial, wireframeMaterial);
       }
     },
     update(_elapsedTime: number): void {
@@ -66,7 +96,34 @@ function trackMaterialDisposables(
   }
 }
 
-function createLoadedModel(geometry: BufferGeometry): Mesh {
+function createLoadedModel(loadedGeometry: BufferGeometry): {
+  mesh: Mesh<BufferGeometry, Material>;
+  solidMaterial: MeshPhysicalMaterial;
+  wireframeMaterial: ShaderMaterial;
+} {
+  const geometry = createModelGeometry(loadedGeometry);
+  const scaledHeight = geometry.boundingBox?.getSize(new Vector3()).y ?? MODEL_TARGET_HEIGHT;
+  const solidMaterial = new MeshPhysicalMaterial({
+    color: new Color('#d36e4a'),
+    roughness: 0.24,
+    metalness: 0.22,
+    clearcoat: 0.68,
+    clearcoatRoughness: 0.16,
+  });
+  const wireframeMaterial = createWireframeMaterial();
+  const mesh = new Mesh<BufferGeometry, Material>(geometry, solidMaterial);
+  mesh.position.y = scaledHeight * 0.5;
+
+  return { mesh, solidMaterial, wireframeMaterial };
+}
+
+function createModelGeometry(loadedGeometry: BufferGeometry): BufferGeometry {
+  const geometry = loadedGeometry.index ? loadedGeometry.toNonIndexed() : loadedGeometry;
+
+  if (geometry !== loadedGeometry) {
+    loadedGeometry.dispose();
+  }
+
   geometry.computeVertexNormals();
   geometry.center();
   geometry.rotateX(Math.PI * 1.5);
@@ -78,21 +135,80 @@ function createLoadedModel(geometry: BufferGeometry): Mesh {
   const scale = Math.min(MODEL_TARGET_HEIGHT / height, MODEL_TARGET_SPAN / footprint);
 
   geometry.scale(scale, scale, scale);
+  geometry.computeVertexNormals();
   geometry.computeBoundingBox();
+  addBarycentricAttribute(geometry);
 
-  const scaledHeight = geometry.boundingBox?.getSize(new Vector3()).y ?? MODEL_TARGET_HEIGHT;
+  return geometry;
+}
 
-  const mesh = new Mesh(
-    geometry,
-    new MeshPhysicalMaterial({
-      color: new Color('#d36e4a'),
-      roughness: 0.24,
-      metalness: 0.22,
-      clearcoat: 0.68,
-      clearcoatRoughness: 0.16,
-    })
-  );
-  mesh.position.y = scaledHeight * 0.5;
+function addBarycentricAttribute(geometry: BufferGeometry): void {
+  const position = geometry.getAttribute('position');
+  const barycentric = new Float32Array(position.count * 3);
 
-  return mesh;
+  for (let vertexIndex = 0; vertexIndex < position.count; vertexIndex += 3) {
+    barycentric.set([1, 0, 0], vertexIndex * 3);
+    barycentric.set([0, 1, 0], (vertexIndex + 1) * 3);
+    barycentric.set([0, 0, 1], (vertexIndex + 2) * 3);
+  }
+
+  geometry.setAttribute('barycentric', new BufferAttribute(barycentric, 3));
+}
+
+function createWireframeMaterial(): ShaderMaterial {
+  return new ShaderMaterial({
+    side: DoubleSide,
+    depthTest: true,
+    depthWrite: false,
+    transparent: true,
+    uniforms: {
+      uLineColor: { value: new Color('#19140f') },
+      uLineOpacity: { value: 0.96 },
+      uLineWidth: { value: 1.35 },
+    },
+    vertexShader: `
+      attribute vec3 barycentric;
+
+      varying vec3 vBarycentric;
+
+      void main() {
+        vBarycentric = barycentric;
+        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
+      }
+    `,
+    fragmentShader: `
+      precision highp float;
+
+      uniform vec3 uLineColor;
+      uniform float uLineOpacity;
+      uniform float uLineWidth;
+
+      varying vec3 vBarycentric;
+
+      float edgeFactor() {
+        vec3 derivative = fwidth(vBarycentric);
+        vec3 edge = smoothstep(vec3(0.0), derivative * uLineWidth, vBarycentric);
+        return 1.0 - min(min(edge.x, edge.y), edge.z);
+      }
+
+      void main() {
+        float edge = edgeFactor();
+
+        if (edge <= 0.001) {
+          discard;
+        }
+
+        gl_FragColor = vec4(uLineColor, edge * uLineOpacity);
+      }
+    `,
+  });
+}
+
+function applyViewMode(
+  mesh: Mesh<BufferGeometry, Material>,
+  viewMode: ModelViewMode,
+  solidMaterial: MeshPhysicalMaterial,
+  wireframeMaterial: ShaderMaterial
+): void {
+  mesh.material = viewMode === 'wireframe' ? wireframeMaterial : solidMaterial;
 }

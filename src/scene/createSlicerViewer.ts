@@ -13,10 +13,15 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
 import { createExampleModel } from './createExampleModel';
 import { createInfiniteGrid } from './createInfiniteGrid';
+import type { ModelViewMode } from './modelViewMode';
 
 import type { Disposable } from '@/app/mountSlicerApp';
 
-export function createSlicerViewer(container: HTMLElement): Disposable {
+export interface SlicerViewer extends Disposable {
+  setViewMode(viewMode: ModelViewMode): void;
+}
+
+export function createSlicerViewer(container: HTMLElement): SlicerViewer {
   const renderer = new WebGLRenderer({
     alpha: true,
     antialias: true,
@@ -38,7 +43,7 @@ export function createSlicerViewer(container: HTMLElement): Disposable {
 
   const controls = new OrbitControls(camera, renderer.domElement);
   controls.enableDamping = true;
-  controls.minDistance = 3.5;
+  controls.minDistance = 1.4;
   controls.maxDistance = 22;
   controls.maxPolarAngle = Math.PI * 0.48;
   controls.target.set(0, 1.1, 0);
@@ -95,6 +100,9 @@ export function createSlicerViewer(container: HTMLElement): Disposable {
       window.removeEventListener('resize', resize);
       renderer.dispose();
       renderer.domElement.remove();
+    },
+    setViewMode(viewMode: ModelViewMode): void {
+      model.setViewMode(viewMode);
     },
   };
 }
