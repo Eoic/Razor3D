@@ -1,29 +1,17 @@
 {
-  "name": "typescript-vite-starter",
-  "private": false,
+  "name": "slicer",
+  "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Modern TypeScript & Vite starter template with comprehensive tooling for production-ready frontend development.",
+  "description": "Three.js application starter for Slicer.",
   "keywords": [
-    "typescript",
+    "three",
+    "threejs",
     "vite",
-    "starter",
-    "template",
-    "frontend",
-    "vitest",
-    "eslint",
-    "prettier",
-    "scss",
-    "modern"
+    "typescript",
+    "webgl",
+    "3d"
   ],
-  "repository": {
-    "type": "git",
-    "url": "https://github.com/Eoic/TypescriptViteTemplate.git"
-  },
-  "bugs": {
-    "url": "https://github.com/Eoic/TypescriptViteTemplate/issues"
-  },
-  "homepage": "https://github.com/Eoic/TypescriptViteTemplate#readme",
   "engines": {
     "node": ">=18.0.0",
     "npm": ">=9.0.0"
@@ -32,17 +20,20 @@
     "dev": "vite",
     "build": "tsc && vite build",
     "preview": "vite preview",
-    "lint": "eslint src --ext .ts,.tsx",
-    "lint:fix": "eslint src --ext .ts,.tsx --fix",
+    "lint": "eslint . --ext .ts,.tsx,.js",
+    "lint:fix": "eslint . --ext .ts,.tsx,.js --fix",
     "type-check": "tsc --noEmit",
     "test": "vitest run",
     "test:watch": "vitest",
     "test:ui": "vitest --ui",
     "test:coverage": "vitest --coverage",
-    "format": "prettier --write \"src/**/*.{ts,tsx,css,scss,md}\"",
-    "format:check": "prettier --check \"src/**/*.{ts,tsx,css,scss,md}\"",
+    "format": "prettier --write \"**/*.{ts,tsx,js,scss,md,html}\"",
+    "format:check": "prettier --check \"**/*.{ts,tsx,js,scss,md,html}\"",
     "ci": "npm run type-check && npm run lint && npm run test && npm run build",
     "prepare": "husky"
+  },
+  "dependencies": {
+    "three": "^0.183.2"
   },
   "devDependencies": {
     "@commitlint/cli": "^19.0.0",
@@ -52,6 +43,7 @@
     "@stylistic/eslint-plugin-ts": "^4.4.1",
     "@types/eslint__js": "^8.42.3",
     "@types/node": "^22.0.0",
+    "@types/three": "^0.183.1",
     "@vitest/coverage-v8": "^2.0.0",
     "@vitest/ui": "^2.0.0",
     "eslint": "^9.0.0",

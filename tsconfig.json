@@ -25,13 +25,8 @@
     "noImplicitOverride": true,
 
     /* Path mapping. */
-    "baseUrl": ".",
-    "typeRoots": ["src/types", "node_modules/@types"],
     "paths": {
-      "@/*": ["src/*"],
-      "@/types/*": ["src/types/*"],
-      "@/utils/*": ["src/utils/*"],
-      "@/components/*": ["src/components/*"]
+      "@/*": ["./src/*"]
     }
   },
   "include": ["src/**/*", "tests/**/*"],

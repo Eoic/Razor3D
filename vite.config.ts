@@ -12,7 +12,6 @@ export default defineConfig({
     preprocessorOptions: {
       scss: {
         api: 'modern',
-        additionalData: '@use "@/styles/tokens" as *;',
       },
     },
   },
@@ -31,7 +30,6 @@ export default defineConfig({
   },
   server: {
     port: 3000,
-    open: true,
   },
   preview: {
     port: 4173,
