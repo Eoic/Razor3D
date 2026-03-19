@@ -41,7 +41,7 @@ export function createSlicerViewer(container: HTMLElement): Disposable {
   controls.minDistance = 3.5;
   controls.maxDistance = 22;
   controls.maxPolarAngle = Math.PI * 0.48;
-  controls.target.set(0, 1.45, 0);
+  controls.target.set(0, 1.1, 0);
   controls.update();
 
   scene.add(new HemisphereLight('#fff5dd', '#4b301d', 2.4));
@@ -90,6 +90,7 @@ export function createSlicerViewer(container: HTMLElement): Disposable {
   return {
     dispose(): void {
       window.cancelAnimationFrame(animationFrameId);
+      model.dispose();
       controls.dispose();
       window.removeEventListener('resize', resize);
       renderer.dispose();

@@ -21,9 +21,8 @@ export function mountSlicerApp(root: HTMLElement, options: MountSlicerAppOptions
   const hud = document.createElement('aside');
   hud.className = 'hud';
   hud.innerHTML = `
-    <p class="hud__kicker">Three.js Workspace</p>
     <h1>Slicer</h1>
-    <p>Orbit the scene, inspect the shader grid, and use the procedural model as a working baseline.</p>
+    <p>Orbit the scene, inspect the shader grid, and review the imported STL model in the live viewport.</p>
     <ul>
       <li>Orbit: Left Drag</li>
       <li>Pan: Right Drag</li>

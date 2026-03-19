@@ -9,7 +9,9 @@ export function createInfiniteGrid(): InfiniteGrid {
   const uniforms = {
     uCameraPosition: { value: new Vector3() },
     uGridColor: { value: new Color('#6d665d') },
-    uAxisColor: { value: new Color('#cf6c4e') },
+    uPrimaryGridColor: { value: new Color('#887f74') },
+    uXAxisColor: { value: new Color('#d14b43') },
+    uZAxisColor: { value: new Color('#3f6edb') },
     uFadeDistance: { value: 140 },
     uPrimaryScale: { value: 5 },
     uSecondaryScale: { value: 1 },
@@ -35,7 +37,9 @@ export function createInfiniteGrid(): InfiniteGrid {
 
       uniform vec3 uCameraPosition;
       uniform vec3 uGridColor;
-      uniform vec3 uAxisColor;
+      uniform vec3 uPrimaryGridColor;
+      uniform vec3 uXAxisColor;
+      uniform vec3 uZAxisColor;
       uniform float uFadeDistance;
       uniform float uPrimaryScale;
       uniform float uSecondaryScale;
@@ -53,16 +57,19 @@ export function createInfiniteGrid(): InfiniteGrid {
         float fade = 1.0 - smoothstep(uFadeDistance * 0.25, uFadeDistance, distanceToCamera);
         float primary = gridFactor(coordinate, uPrimaryScale);
         float secondary = gridFactor(coordinate, uSecondaryScale) * 0.42;
-        float axisX = 1.0 - min(abs(vWorldPosition.x) / fwidth(vWorldPosition.x), 1.0);
-        float axisZ = 1.0 - min(abs(vWorldPosition.z) / fwidth(vWorldPosition.z), 1.0);
-        float axis = max(axisX, axisZ);
-        float alpha = max(max(primary, secondary), axis * 0.92) * fade;
+        float xAxis = 1.0 - min(abs(vWorldPosition.z) / fwidth(vWorldPosition.z), 1.0);
+        float zAxis = 1.0 - min(abs(vWorldPosition.x) / fwidth(vWorldPosition.x), 1.0);
+        float axis = max(xAxis, zAxis);
+        float alpha = max(max(primary * 0.92, secondary), axis) * fade;
 
         if (alpha <= 0.001) {
           discard;
         }
 
-        vec3 color = mix(uGridColor, uAxisColor, axis);
+        vec3 color = uGridColor;
+        color = mix(color, uPrimaryGridColor, primary);
+        color = mix(color, uXAxisColor, xAxis);
+        color = mix(color, uZAxisColor, zAxis);
         gl_FragColor = vec4(color, alpha);
       }
     `,
