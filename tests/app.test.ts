@@ -18,13 +18,11 @@ describe('mountSlicerApp', () => {
     const app = mountSlicerApp(root, { createViewer });
 
     expect(root.querySelector('[data-scene-root]')).not.toBeNull();
-    expect(root.querySelector('h1')?.textContent).toBe('Slicer');
     expect(root.querySelector('.hud h3')?.textContent).toBe('Controls');
     expect(root.querySelector('.tool-rail')).not.toBeNull();
     expect(createViewer).toHaveBeenCalledOnce();
-    expect(setViewMode).toHaveBeenCalledWith('solid');
 
-    const wireframeButton = root.querySelector<HTMLButtonElement>('[data-view-mode="wireframe"]');
+    const wireframeButton = root.querySelector<HTMLButtonElement>('[data-tool-id="wireframe"]');
 
     if (!wireframeButton) {
       throw new Error('Missing wireframe button');

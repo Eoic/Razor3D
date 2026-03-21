@@ -15,18 +15,22 @@ import { createExampleModel } from './createExampleModel';
 import { createInfiniteGrid } from './createInfiniteGrid';
 import type { ModelViewMode } from './modelViewMode';
 
-import type { Disposable } from '@/app/mountSlicerApp';
+import { getTheme, onThemeChange } from '@/theme/themeColors';
+import type { Disposable } from '@/types/disposable';
 
 export interface SlicerViewer extends Disposable {
   setViewMode(viewMode: ModelViewMode): void;
 }
 
 export function createSlicerViewer(container: HTMLElement): SlicerViewer {
+  const theme = getTheme();
+
   const renderer = new WebGLRenderer({
     alpha: true,
     antialias: true,
     powerPreference: 'high-performance',
   });
+
   renderer.outputColorSpace = SRGBColorSpace;
   renderer.toneMapping = ACESFilmicToneMapping;
   renderer.toneMappingExposure = 1.08;
@@ -35,8 +39,8 @@ export function createSlicerViewer(container: HTMLElement): SlicerViewer {
   container.append(renderer.domElement);
 
   const scene = new Scene();
-  scene.background = new Color('#f4ede1');
-  scene.fog = new Fog('#f4ede1', 14, 34);
+  scene.background = new Color(theme.sceneBackground);
+  scene.fog = new Fog(theme.sceneFog, theme.fogNear, theme.fogFar);
 
   const camera = new PerspectiveCamera(50, 1, 0.1, 120);
   camera.position.set(6.5, 4.6, 6.5);
@@ -49,13 +53,14 @@ export function createSlicerViewer(container: HTMLElement): SlicerViewer {
   controls.target.set(0, 1.1, 0);
   controls.update();
 
-  scene.add(new HemisphereLight('#fff5dd', '#4b301d', 2.4));
+  const hemisphereLight = new HemisphereLight(theme.hemisphereSky, theme.hemisphereGround, theme.hemisphereIntensity);
+  scene.add(hemisphereLight);
 
-  const keyLight = new DirectionalLight('#fff2da', 3.4);
+  const keyLight = new DirectionalLight(theme.keyLight, theme.keyLightIntensity);
   keyLight.position.set(6, 9, 5);
   scene.add(keyLight);
 
-  const rimLight = new DirectionalLight('#8ca7ff', 1.1);
+  const rimLight = new DirectionalLight(theme.rimLight, theme.rimLightIntensity);
   rimLight.position.set(-5, 4, -6);
   scene.add(rimLight);
 
@@ -64,6 +69,25 @@ export function createSlicerViewer(container: HTMLElement): SlicerViewer {
 
   const grid = createInfiniteGrid();
   scene.add(grid.mesh);
+
+  const fog = scene.fog;
+
+  const unsubscribeTheme = onThemeChange(nextTheme => {
+    (scene.background as Color).set(nextTheme.sceneBackground);
+    fog.color.set(nextTheme.sceneFog);
+    fog.near = nextTheme.fogNear;
+    fog.far = nextTheme.fogFar;
+
+    hemisphereLight.color.set(nextTheme.hemisphereSky);
+    hemisphereLight.groundColor.set(nextTheme.hemisphereGround);
+    hemisphereLight.intensity = nextTheme.hemisphereIntensity;
+
+    keyLight.color.set(nextTheme.keyLight);
+    keyLight.intensity = nextTheme.keyLightIntensity;
+
+    rimLight.color.set(nextTheme.rimLight);
+    rimLight.intensity = nextTheme.rimLightIntensity;
+  });
 
   let animationFrameId = 0;
 
@@ -95,7 +119,9 @@ export function createSlicerViewer(container: HTMLElement): SlicerViewer {
   return {
     dispose(): void {
       window.cancelAnimationFrame(animationFrameId);
+      unsubscribeTheme();
       model.dispose();
+      grid.dispose();
       controls.dispose();
       window.removeEventListener('resize', resize);
       renderer.dispose();

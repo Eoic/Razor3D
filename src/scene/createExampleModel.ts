@@ -14,6 +14,10 @@ import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 
 import type { ModelViewMode } from './modelViewMode';
 
+import wireframeFrag from '@/shaders/wireframe.frag?raw';
+import wireframeVert from '@/shaders/wireframe.vert?raw';
+import { getTheme, onThemeChange } from '@/theme/themeColors';
+
 const MODEL_URL = '/models/example.stl';
 const MODEL_TARGET_HEIGHT = 2.2;
 const MODEL_TARGET_SPAN = 2.6;
@@ -34,6 +38,18 @@ export function createExampleModel(initialViewMode: ModelViewMode = DEFAULT_VIEW
   let solidMaterial: MeshPhysicalMaterial | null = null;
   let wireframeMaterial: ShaderMaterial | null = null;
   let viewMode = initialViewMode;
+
+  const unsubscribeTheme = onThemeChange(nextTheme => {
+    if (solidMaterial) {
+      solidMaterial.color.set(nextTheme.modelColor);
+    }
+    if (wireframeMaterial) {
+      const lineColorUniform = wireframeMaterial.uniforms['uLineColor'];
+      if (lineColorUniform) {
+        (lineColorUniform.value as Color).set(nextTheme.wireframeLineColor);
+      }
+    }
+  });
 
   const loader = new STLLoader();
 
@@ -64,6 +80,7 @@ export function createExampleModel(initialViewMode: ModelViewMode = DEFAULT_VIEW
     group,
     dispose(): void {
       disposed = true;
+      unsubscribeTheme();
 
       for (const resource of disposableResources) {
         resource.dispose();
@@ -103,8 +120,9 @@ function createLoadedModel(loadedGeometry: BufferGeometry): {
 } {
   const geometry = createModelGeometry(loadedGeometry);
   const scaledHeight = geometry.boundingBox?.getSize(new Vector3()).y ?? MODEL_TARGET_HEIGHT;
+  const theme = getTheme();
   const solidMaterial = new MeshPhysicalMaterial({
-    color: new Color('#d36e4a'),
+    color: new Color(theme.modelColor),
     roughness: 0.24,
     metalness: 0.22,
     clearcoat: 0.68,
@@ -156,51 +174,19 @@ function addBarycentricAttribute(geometry: BufferGeometry): void {
 }
 
 function createWireframeMaterial(): ShaderMaterial {
+  const theme = getTheme();
   return new ShaderMaterial({
     side: DoubleSide,
     depthTest: true,
     depthWrite: false,
     transparent: true,
     uniforms: {
-      uLineColor: { value: new Color('#19140f') },
+      uLineColor: { value: new Color(theme.wireframeLineColor) },
       uLineOpacity: { value: 0.96 },
       uLineWidth: { value: 1.35 },
     },
-    vertexShader: `
-      attribute vec3 barycentric;
-
-      varying vec3 vBarycentric;
-
-      void main() {
-        vBarycentric = barycentric;
-        gl_Position = projectionMatrix * modelViewMatrix * vec4(position, 1.0);
-      }
-    `,
-    fragmentShader: `
-      precision highp float;
-
-      uniform vec3 uLineColor;
-      uniform float uLineOpacity;
-      uniform float uLineWidth;
-
-      varying vec3 vBarycentric;
-
-      float edgeFactor() {
-        vec3 derivative = fwidth(vBarycentric);
-        vec3 edge = smoothstep(vec3(0.0), derivative * uLineWidth, vBarycentric);
-        return 1.0 - min(min(edge.x, edge.y), edge.z);
-      }
-
-      void main() {
-        float edge = edgeFactor();
-
-        if (edge <= 0.001) {
-          discard;
-        }
-
-        gl_FragColor = vec4(uLineColor, edge * uLineOpacity);
-      }
-    `,
+    vertexShader: wireframeVert,
+    fragmentShader: wireframeFrag,
   });
 }
 
