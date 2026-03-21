@@ -24,15 +24,18 @@ const MODEL_TARGET_SPAN = 2.6;
 const DEFAULT_VIEW_MODE: ModelViewMode = 'solid';
 
 export interface ExampleModel {
-  group: Group;
+  readonly group: Group;
+  readonly mesh: Mesh<BufferGeometry, Material> | null;
   dispose(): void;
   setViewMode(viewMode: ModelViewMode): void;
   update(elapsedTime: number): void;
+  onReady(callback: () => void): void;
 }
 
 export function createExampleModel(initialViewMode: ModelViewMode = DEFAULT_VIEW_MODE): ExampleModel {
   const group = new Group();
   const disposableResources: Array<{ dispose(): void }> = [];
+  const readyCallbacks: Array<() => void> = [];
   let disposed = false;
   let mesh: Mesh<BufferGeometry, Material> | null = null;
   let solidMaterial: MeshPhysicalMaterial | null = null;
@@ -71,6 +74,10 @@ export function createExampleModel(initialViewMode: ModelViewMode = DEFAULT_VIEW
 
       disposableResources.push(mesh.geometry);
       trackMaterialDisposables(disposableResources, solidMaterial, wireframeMaterial);
+
+      for (const cb of readyCallbacks) {
+        cb();
+      }
     })
     .catch((error: unknown) => {
       console.error(`Failed to load STL model from ${MODEL_URL}.`, error);
@@ -78,6 +85,9 @@ export function createExampleModel(initialViewMode: ModelViewMode = DEFAULT_VIEW
 
   return {
     group,
+    get mesh() {
+      return mesh;
+    },
     dispose(): void {
       disposed = true;
       unsubscribeTheme();
@@ -95,6 +105,13 @@ export function createExampleModel(initialViewMode: ModelViewMode = DEFAULT_VIEW
     },
     update(_elapsedTime: number): void {
       // Intentionally static.
+    },
+    onReady(callback: () => void): void {
+      if (mesh) {
+        callback();
+      } else {
+        readyCallbacks.push(callback);
+      }
     },
   };
 }

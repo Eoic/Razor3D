@@ -14,12 +14,14 @@ import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { createExampleModel } from './createExampleModel';
 import { createInfiniteGrid } from './createInfiniteGrid';
 import type { ModelViewMode } from './modelViewMode';
+import { SceneGraph } from './sceneGraph';
 
 import { getTheme, onThemeChange } from '@/theme/themeColors';
 import type { Disposable } from '@/types/disposable';
 
 export interface SlicerViewer extends Disposable {
   setViewMode(viewMode: ModelViewMode): void;
+  readonly sceneGraph: SceneGraph;
 }
 
 export function createSlicerViewer(container: HTMLElement): SlicerViewer {
@@ -66,6 +68,21 @@ export function createSlicerViewer(container: HTMLElement): SlicerViewer {
 
   const model = createExampleModel();
   scene.add(model.group);
+
+  const sceneGraph = new SceneGraph();
+
+  model.onReady(() => {
+    if (model.mesh) {
+      sceneGraph.addNode({
+        id: 'example-model',
+        label: 'Example Model',
+        visible: true,
+        color: getTheme().modelColor,
+        object3D: model.mesh,
+        children: [],
+      });
+    }
+  });
 
   const grid = createInfiniteGrid();
   scene.add(grid.mesh);
@@ -130,5 +147,6 @@ export function createSlicerViewer(container: HTMLElement): SlicerViewer {
     setViewMode(viewMode: ModelViewMode): void {
       model.setViewMode(viewMode);
     },
+    sceneGraph,
   };
 }

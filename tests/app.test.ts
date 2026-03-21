@@ -1,6 +1,7 @@
 import { describe, expect, it, vi } from 'vitest';
 
 import { mountSlicerApp } from '@/app/mountSlicerApp';
+import { SceneGraph } from '@/scene/sceneGraph';
 
 describe('mountSlicerApp', () => {
   it('wires up the viewer and toggles wireframe mode on and off', () => {
@@ -17,7 +18,8 @@ describe('mountSlicerApp', () => {
 
     const dispose = vi.fn();
     const setViewMode = vi.fn();
-    const createViewer = vi.fn(() => ({ dispose, setViewMode }));
+    const sceneGraph = new SceneGraph();
+    const createViewer = vi.fn(() => ({ dispose, setViewMode, sceneGraph }));
     const root = document.querySelector<HTMLElement>('#app');
 
     if (!root) {
