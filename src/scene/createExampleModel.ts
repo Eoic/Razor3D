@@ -46,8 +46,10 @@ export function createExampleModel(initialViewMode: ModelViewMode = DEFAULT_VIEW
     if (solidMaterial) {
       solidMaterial.color.set(nextTheme.modelColor);
     }
+
     if (wireframeMaterial) {
       const lineColorUniform = wireframeMaterial.uniforms['uLineColor'];
+
       if (lineColorUniform) {
         (lineColorUniform.value as Color).set(nextTheme.wireframeLineColor);
       }
@@ -138,6 +140,7 @@ function createLoadedModel(loadedGeometry: BufferGeometry): {
   const geometry = createModelGeometry(loadedGeometry);
   const scaledHeight = geometry.boundingBox?.getSize(new Vector3()).y ?? MODEL_TARGET_HEIGHT;
   const theme = getTheme();
+
   const solidMaterial = new MeshPhysicalMaterial({
     color: new Color(theme.modelColor),
     roughness: 0.24,
@@ -145,6 +148,7 @@ function createLoadedModel(loadedGeometry: BufferGeometry): {
     clearcoat: 0.68,
     clearcoatRoughness: 0.16,
   });
+
   const wireframeMaterial = createWireframeMaterial();
   const mesh = new Mesh<BufferGeometry, Material>(geometry, solidMaterial);
   mesh.position.y = scaledHeight * 0.5;

@@ -11,6 +11,10 @@ export class ToolRegistry {
       throw new Error(`Tool button #${tool.buttonId} not found in the document.`);
     }
 
+    if (button.dataset.active === 'true') {
+      this.activeTools.add(tool.buttonId);
+    }
+
     button.addEventListener('click', () => {
       if (this.activeTools.has(tool.buttonId)) {
         this.activeTools.delete(tool.buttonId);
@@ -32,6 +36,7 @@ export class ToolRegistry {
     for (const { tool } of this.tools) {
       tool.dispose?.();
     }
+
     this.tools = [];
     this.activeTools.clear();
   }

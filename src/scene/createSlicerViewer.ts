@@ -21,6 +21,7 @@ import type { Disposable } from '@/types/disposable';
 
 export interface SlicerViewer extends Disposable {
   setViewMode(viewMode: ModelViewMode): void;
+  resetCamera(): void;
   readonly sceneGraph: SceneGraph;
 }
 
@@ -146,6 +147,11 @@ export function createSlicerViewer(container: HTMLElement): SlicerViewer {
     },
     setViewMode(viewMode: ModelViewMode): void {
       model.setViewMode(viewMode);
+    },
+    resetCamera(): void {
+      camera.position.set(6.5, 4.6, 6.5);
+      controls.target.set(0, 1.1, 0);
+      controls.update();
     },
     sceneGraph,
   };
