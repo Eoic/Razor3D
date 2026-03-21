@@ -1,49 +1,38 @@
 import type { EditorTool } from './types';
 
 export class ToolRegistry {
-  private tools = new Map<string, { tool: EditorTool; button: HTMLButtonElement }>();
+  private tools: Array<{ tool: EditorTool; button: HTMLButtonElement }> = [];
   private activeTools = new Set<string>();
 
   register(tool: EditorTool): void {
-    const button = document.createElement('button');
-    button.type = 'button';
-    button.className = 'tool-button';
-    button.dataset.toolId = tool.id;
-    button.dataset.active = 'false';
-    button.setAttribute('aria-label', tool.label);
-    button.setAttribute('aria-pressed', 'false');
-    button.title = tool.label;
+    const button = document.getElementById(tool.buttonId);
 
-    button.append(tool.createIcon());
+    if (!(button instanceof HTMLButtonElement)) {
+      throw new Error(`Tool button #${tool.buttonId} not found in the document.`);
+    }
 
     button.addEventListener('click', () => {
-      if (this.activeTools.has(tool.id)) {
-        this.activeTools.delete(tool.id);
+      if (this.activeTools.has(tool.buttonId)) {
+        this.activeTools.delete(tool.buttonId);
         tool.onDeactivate();
         button.dataset.active = 'false';
         button.setAttribute('aria-pressed', 'false');
       } else {
-        this.activeTools.add(tool.id);
+        this.activeTools.add(tool.buttonId);
         tool.onActivate();
         button.dataset.active = 'true';
         button.setAttribute('aria-pressed', 'true');
       }
     });
 
-    this.tools.set(tool.id, { tool, button });
-  }
-
-  mount(container: HTMLElement): void {
-    for (const { button } of this.tools.values()) {
-      container.append(button);
-    }
+    this.tools.push({ tool, button });
   }
 
   dispose(): void {
-    for (const { tool } of this.tools.values()) {
+    for (const { tool } of this.tools) {
       tool.dispose?.();
     }
-    this.tools.clear();
+    this.tools = [];
     this.activeTools.clear();
   }
 }

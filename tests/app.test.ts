@@ -3,8 +3,17 @@ import { describe, expect, it, vi } from 'vitest';
 import { mountSlicerApp } from '@/app/mountSlicerApp';
 
 describe('mountSlicerApp', () => {
-  it('renders the Slicer shell and toggles wireframe mode on and off', () => {
-    document.body.innerHTML = '<div id="app"></div>';
+  it('wires up the viewer and toggles wireframe mode on and off', () => {
+    document.body.innerHTML = `
+      <div id="app" class="app-shell">
+        <div class="scene-frame" data-scene-root="true"></div>
+        <aside class="tool-rail">
+          <div class="tool-rail__group" role="toolbar" aria-label="View tools">
+            <button id="tool-wireframe" type="button" class="tool-button" aria-label="Wireframe" aria-pressed="false" title="Wireframe"></button>
+          </div>
+        </aside>
+      </div>
+    `;
 
     const dispose = vi.fn();
     const setViewMode = vi.fn();
@@ -17,16 +26,9 @@ describe('mountSlicerApp', () => {
 
     const app = mountSlicerApp(root, { createViewer });
 
-    expect(root.querySelector('[data-scene-root]')).not.toBeNull();
-    expect(root.querySelector('.hud h3')?.textContent).toBe('Controls');
-    expect(root.querySelector('.tool-rail')).not.toBeNull();
     expect(createViewer).toHaveBeenCalledOnce();
 
-    const wireframeButton = root.querySelector<HTMLButtonElement>('[data-tool-id="wireframe"]');
-
-    if (!wireframeButton) {
-      throw new Error('Missing wireframe button');
-    }
+    const wireframeButton = document.getElementById('tool-wireframe') as HTMLButtonElement;
 
     wireframeButton.click();
 

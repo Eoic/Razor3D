@@ -1,10 +1,6 @@
 export interface EditorTool {
-  /** Unique identifier for the tool */
-  id: string;
-  /** Human-readable label (used for aria-label and title) */
-  label: string;
-  /** Create the SVG icon for the toolbar button */
-  createIcon(): SVGSVGElement;
+  /** ID of the button element in the HTML page */
+  buttonId: string;
   /** Called when the tool is toggled on */
   onActivate(): void;
   /** Called when the tool is toggled off */
