@@ -23,7 +23,7 @@ Shared rendering utility that:
 
 ```ts
 interface StateSource {
-  onChange(callback: () => void): () => void;
+  onChange(callback: (...args: unknown[]) => void): () => void;
 }
 
 function renderTo(
@@ -34,7 +34,7 @@ function renderTo(
 ```
 
 Behavior:
-- Subscribes to the state source's `onChange` callback. The callback argument is ignored — `templateFn` re-reads current state on each call.
+- Subscribes to the state source's `onChange` callback. The callback uses `(...args: unknown[])` to be structurally compatible with any callback signature (e.g., `SceneGraph.onChange` which passes a `SceneChangeEvent`). The arguments are ignored — `templateFn` re-reads current state on each call.
 - Calls lit-html `render()` with the template function's result on each change.
 - Does an initial render immediately.
 - Returns a `Disposable` that unsubscribes on `dispose()`.
