@@ -1,12 +1,4 @@
-import {
-  BufferGeometry,
-  Color,
-  Group,
-  Material,
-  Mesh,
-  MeshPhysicalMaterial,
-  ShaderMaterial,
-} from 'three';
+import { BufferGeometry, Color, Group, Material, Mesh, MeshPhysicalMaterial, ShaderMaterial } from 'three';
 import { STLLoader } from 'three/examples/jsm/loaders/STLLoader.js';
 
 import type { ModelViewMode } from './modelViewMode';
