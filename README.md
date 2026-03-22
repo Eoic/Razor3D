@@ -1,4 +1,4 @@
-# Slicer
+# Razor3D
 
 Mesh slicing by a polyline.
 

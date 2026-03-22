@@ -1,11 +1,8 @@
 export interface ThemeColors {
-  // Scene
   sceneBackground: string;
   sceneFog: string;
   fogNear: number;
   fogFar: number;
-
-  // Lighting
   hemisphereSky: string;
   hemisphereGround: string;
   hemisphereIntensity: number;
@@ -13,14 +10,8 @@ export interface ThemeColors {
   keyLightIntensity: number;
   rimLight: string;
   rimLightIntensity: number;
-
-  // Model
   modelColor: string;
-
-  // Wireframe
   wireframeLineColor: string;
-
-  // Grid
   gridColor: string;
   primaryGridColor: string;
   xAxisColor: string;

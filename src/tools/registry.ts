@@ -16,17 +16,18 @@ export class ToolRegistry {
     }
 
     button.addEventListener('click', () => {
-      if (this.activeTools.has(tool.buttonId)) {
+      const isActive = this.activeTools.has(tool.buttonId);
+
+      if (isActive) {
         this.activeTools.delete(tool.buttonId);
         tool.onDeactivate();
-        button.dataset.active = 'false';
-        button.setAttribute('aria-pressed', 'false');
       } else {
         this.activeTools.add(tool.buttonId);
         tool.onActivate();
-        button.dataset.active = 'true';
-        button.setAttribute('aria-pressed', 'true');
       }
+
+      button.dataset.active = String(!isActive);
+      button.setAttribute('aria-pressed', String(!isActive));
     });
 
     this.tools.push({ tool, button });

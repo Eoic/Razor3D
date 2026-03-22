@@ -144,10 +144,10 @@ export class SceneGraph {
   }
 
   private applyHighlight(node: SceneNode): void {
-    const obj = node.object3D;
+    const sceneObject = node.object3D;
 
-    if (obj instanceof Mesh) {
-      const existingOutline = this.selectionOutlines.get(obj);
+    if (sceneObject instanceof Mesh) {
+      const existingOutline = this.selectionOutlines.get(sceneObject);
 
       if (existingOutline) {
         existingOutline.visible = true;
@@ -155,7 +155,7 @@ export class SceneGraph {
       }
 
       const outline = new Mesh(
-        obj.geometry,
+        sceneObject.geometry,
         new MeshBasicMaterial({
           color: SELECTION_OUTLINE_COLOR,
           side: BackSide,
@@ -168,23 +168,24 @@ export class SceneGraph {
       outline.renderOrder = 1;
       outline.scale.setScalar(SELECTION_OUTLINE_SCALE);
       outline.raycast = () => null;
-      obj.add(outline);
-      this.selectionOutlines.set(obj, outline);
+      sceneObject.add(outline);
+      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
+      this.selectionOutlines.set(sceneObject, outline);
     }
   }
 
   private removeHighlight(node: SceneNode): void {
-    const obj = node.object3D;
-    const outline = this.selectionOutlines.get(obj);
+    const sceneObject = node.object3D;
+    const outline = this.selectionOutlines.get(sceneObject);
 
-    if (outline && obj instanceof Mesh) {
+    if (outline && sceneObject instanceof Mesh) {
       outline.removeFromParent();
 
       if (outline.material instanceof MeshBasicMaterial) {
         outline.material.dispose();
       }
 
-      this.selectionOutlines.delete(obj);
+      this.selectionOutlines.delete(sceneObject);
     }
   }
 
