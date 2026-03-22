@@ -1,5 +1,5 @@
-import { describe, expect, it, vi } from 'vitest';
 import { Group } from 'three';
+import { describe, expect, it, vi } from 'vitest';
 
 import { mountSlicerApp } from '@/app/mountSlicerApp';
 import { SceneGraph } from '@/scene/sceneGraph';
