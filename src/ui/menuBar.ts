@@ -8,8 +8,13 @@ function isAction(item: MenuItem): item is MenuItemAction {
   return item.type === 'action';
 }
 
-export function createMenuBar(container: HTMLElement, menus: MenuDefinition[]): Disposable {
+export interface MenuBarHandle extends Disposable {
+  setStatus(text: string): void;
+}
+
+export function createMenuBar(container: HTMLElement, menus: MenuDefinition[]): MenuBarHandle {
   let openIndex = -1;
+  let statusText = '';
 
   function renderMenuBar(): void {
     render(menuBarTemplate(), container);
@@ -52,6 +57,7 @@ export function createMenuBar(container: HTMLElement, menus: MenuDefinition[]): 
           </div>
         `
       )}
+      ${statusText ? html`<span class="menu-bar__status">${statusText}</span>` : ''}
     `;
   }
 
@@ -201,6 +207,10 @@ export function createMenuBar(container: HTMLElement, menus: MenuDefinition[]): 
   renderMenuBar();
 
   return {
+    setStatus(text: string): void {
+      statusText = text;
+      renderMenuBar();
+    },
     dispose(): void {
       document.removeEventListener('click', onDocumentClick);
       document.removeEventListener('keydown', onKeyboardShortcut);

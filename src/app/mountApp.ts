@@ -1,12 +1,13 @@
 import { openFilePicker } from '@/import/fileDialog';
 import { importModel } from '@/import/importModel';
 import { createProjectManager } from '@/project/projectManager';
+import { createExampleModel } from '@/scene/createExampleModel';
 import { createViewer, type Viewer } from '@/scene/createViewer';
 import { ToolRegistry } from '@/tools/registry';
 import { createThemeToggleTool } from '@/tools/themeToggleTool';
 import { createWireframeTool } from '@/tools/wireframeTool';
 import type { Disposable } from '@/types/disposable';
-import { createMenuBar } from '@/ui/menuBar';
+import { createMenuBar, type MenuBarHandle } from '@/ui/menuBar';
 import type { MenuDefinition } from '@/ui/menuBar.types';
 import { confirmDelete, pickProject, promptProjectName } from '@/ui/projectDialogs';
 import { createSceneTreePanel } from '@/ui/sceneTreePanel';
@@ -38,9 +39,30 @@ export function mountApp(root: HTMLElement, options: MountOptions = {}): Disposa
   const sceneTreeList = root.querySelector<HTMLUListElement>('.scene-tree__list');
   const sceneTreePanel = sceneTreeList ? createSceneTreePanel(sceneTreeList, viewer.sceneGraph) : null;
 
+  // ── Example model ─────────────────────────────────────────────────────
+
+  const exampleModel = createExampleModel();
+  viewer.scene.add(exampleModel.group);
+  exampleModel.onReady(() => {
+    viewer.sceneGraph.addNode({
+      id: 'example-model',
+      label: 'Example Model',
+      visible: true,
+      color: '#b0b0b0',
+      object3D: exampleModel.group,
+      children: [],
+    });
+  });
+
   // ── Project manager ───────────────────────────────────────────────────
 
   const pm = createProjectManager(viewer);
+  let menuBar: MenuBarHandle | null = null;
+
+  function updateStatus(): void {
+    const name = pm.getCurrentProjectName() ?? 'Untitled';
+    menuBar?.setStatus(name);
+  }
 
   async function handleImportModel(): Promise<void> {
     const selection = await openFilePicker();
@@ -68,6 +90,7 @@ export function mountApp(root: HTMLElement, options: MountOptions = {}): Disposa
 
   function handleNewProject(): void {
     pm.createNew();
+    updateStatus();
   }
 
   async function handleOpenProject(): Promise<void> {
@@ -75,6 +98,7 @@ export function mountApp(root: HTMLElement, options: MountOptions = {}): Disposa
     const id = await pickProject(projects);
     if (id) {
       await pm.open(id);
+      updateStatus();
     }
   }
 
@@ -84,12 +108,22 @@ export function mountApp(root: HTMLElement, options: MountOptions = {}): Disposa
     } else {
       await handleSaveAs();
     }
+    updateStatus();
   }
 
   async function handleSaveAs(): Promise<void> {
     const name = await promptProjectName(pm.getCurrentProjectName() ?? '');
     if (name) {
       await pm.save(name);
+      updateStatus();
+    }
+  }
+
+  async function handleRename(): Promise<void> {
+    const name = await promptProjectName(pm.getCurrentProjectName() ?? '');
+    if (name) {
+      await pm.rename(name);
+      updateStatus();
     }
   }
 
@@ -108,6 +142,7 @@ export function mountApp(root: HTMLElement, options: MountOptions = {}): Disposa
     const confirmed = await confirmDelete(project.name);
     if (confirmed) {
       await pm.deleteProject(id);
+      updateStatus();
     }
   }
 
@@ -161,6 +196,13 @@ export function mountApp(root: HTMLElement, options: MountOptions = {}): Disposa
       { type: 'separator' },
       {
         type: 'action',
+        label: 'Rename Project…',
+        onSelect() {
+          void handleRename();
+        },
+      },
+      {
+        type: 'action',
         label: 'Delete Project',
         onSelect() {
           void handleDeleteProject();
@@ -170,13 +212,15 @@ export function mountApp(root: HTMLElement, options: MountOptions = {}): Disposa
   };
 
   const menuBarContainer = root.querySelector<HTMLElement>('.menu-bar');
-  const menuBar = menuBarContainer ? createMenuBar(menuBarContainer, [fileMenu]) : null;
+  menuBar = menuBarContainer ? createMenuBar(menuBarContainer, [fileMenu]) : null;
+  updateStatus();
 
   return {
     dispose(): void {
       menuBar?.dispose();
       homeButton?.removeEventListener('click', onHomeClick);
       sceneTreePanel?.dispose();
+      exampleModel.dispose();
       registry.dispose();
       viewer.dispose();
     },

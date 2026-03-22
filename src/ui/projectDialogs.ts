@@ -85,7 +85,7 @@ export function pickProject(projects: ProjectRecord[]): Promise<string | null> {
 
     const template = html`
       <div class="dialog" role="dialog" aria-label="Open project">
-        <h3 class="dialog__title">Open Project</h3>
+        <h3 class="dialog__title">Open Project <span class="dialog__count">${sorted.length}</span></h3>
         <div class="dialog__body">
           ${sorted.length === 0
             ? html`<p class="dialog__empty">No saved projects.</p>`

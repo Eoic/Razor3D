@@ -16,6 +16,7 @@ export interface ProjectManager {
   createNew(): void;
   save(name?: string): Promise<void>;
   open(id: string): Promise<void>;
+  rename(name: string): Promise<void>;
   deleteProject(id: string): Promise<void>;
   listProjects(): Promise<ProjectRecord[]>;
   addModelFile(nodeId: string, fileId: string, buffer: ArrayBuffer, format: ModelFormat): void;
@@ -138,6 +139,13 @@ export function createProjectManager(viewer: Viewer): ProjectManager {
     currentProjectName = project.name;
   }
 
+  async function rename(name: string): Promise<void> {
+    currentProjectName = name;
+    if (currentProjectId) {
+      await save(name);
+    }
+  }
+
   async function deleteProjectFn(id: string): Promise<void> {
     await dbDeleteProject(id);
 
@@ -158,6 +166,7 @@ export function createProjectManager(viewer: Viewer): ProjectManager {
     createNew,
     save,
     open,
+    rename,
     deleteProject: deleteProjectFn,
     listProjects,
     addModelFile,
