@@ -1,4 +1,5 @@
-import { Group } from 'three';
+import { Group, PerspectiveCamera, Scene } from 'three';
+import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 import { describe, expect, it, vi } from 'vitest';
 
 import { mountApp } from '@/app/mountApp';
@@ -36,7 +37,18 @@ function setup(): {
   const setViewMode = vi.fn();
   const resetCamera = vi.fn();
   const sceneGraph = new SceneGraph();
-  const createViewer = vi.fn(() => ({ dispose, setViewMode, resetCamera, sceneGraph }));
+  const scene = new Scene();
+  const camera = new PerspectiveCamera();
+  const controls = new OrbitControls(camera);
+  const createViewer = vi.fn(() => ({
+    dispose,
+    setViewMode,
+    resetCamera,
+    sceneGraph,
+    scene,
+    camera,
+    controls,
+  }));
   const root = document.querySelector<HTMLElement>('#app');
 
   if (!root) {

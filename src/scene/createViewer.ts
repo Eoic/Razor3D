@@ -11,7 +11,6 @@ import {
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
 
-import { createExampleModel } from './createExampleModel';
 import { createInfiniteGrid } from './createInfiniteGrid';
 import type { ModelViewMode } from './modelViewMode';
 import { SceneGraph } from './sceneGraph';
@@ -23,6 +22,9 @@ export interface Viewer extends Disposable {
   setViewMode(viewMode: ModelViewMode): void;
   resetCamera(): void;
   readonly sceneGraph: SceneGraph;
+  readonly scene: Scene;
+  readonly camera: PerspectiveCamera;
+  readonly controls: OrbitControls;
 }
 
 export function createViewer(container: HTMLElement): Viewer {
@@ -67,23 +69,7 @@ export function createViewer(container: HTMLElement): Viewer {
   rimLight.position.set(-5, 4, -6);
   scene.add(rimLight);
 
-  const model = createExampleModel();
-  scene.add(model.group);
-
   const sceneGraph = new SceneGraph();
-
-  model.onReady(() => {
-    if (model.mesh) {
-      sceneGraph.addNode({
-        id: 'example-model',
-        label: 'Example Model',
-        visible: true,
-        color: getTheme().modelColor,
-        object3D: model.mesh,
-        children: [],
-      });
-    }
-  });
 
   const grid = createInfiniteGrid();
   scene.add(grid.mesh);
@@ -121,11 +107,8 @@ export function createViewer(container: HTMLElement): Viewer {
   window.addEventListener('resize', resize);
   resize();
 
-  const render = (time: number): void => {
-    const elapsedTime = time * 0.001;
-
+  const render = (_time: number): void => {
     controls.update();
-    model.update(elapsedTime);
     grid.update(camera);
     renderer.render(scene, camera);
 
@@ -138,15 +121,14 @@ export function createViewer(container: HTMLElement): Viewer {
     dispose(): void {
       window.cancelAnimationFrame(animationFrameId);
       unsubscribeTheme();
-      model.dispose();
       grid.dispose();
       controls.dispose();
       window.removeEventListener('resize', resize);
       renderer.dispose();
       renderer.domElement.remove();
     },
-    setViewMode(viewMode: ModelViewMode): void {
-      model.setViewMode(viewMode);
+    setViewMode(_viewMode: ModelViewMode): void {
+      // No-op: per-model view modes will be added later.
     },
     resetCamera(): void {
       camera.position.set(6.5, 4.6, 6.5);
@@ -154,5 +136,8 @@ export function createViewer(container: HTMLElement): Viewer {
       controls.update();
     },
     sceneGraph,
+    scene,
+    camera,
+    controls,
   };
 }

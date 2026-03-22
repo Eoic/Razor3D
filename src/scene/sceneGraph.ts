@@ -95,6 +95,13 @@ export class SceneGraph {
     }
   }
 
+  clear(): void {
+    for (const node of [...this.nodes]) {
+      this.removeNode(node.id);
+    }
+    this.selectedId = null;
+  }
+
   onChange(callback: (event: SceneChangeEvent) => void): () => void {
     this.listeners.add(callback);
 
