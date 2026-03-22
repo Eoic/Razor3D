@@ -7,6 +7,7 @@ import { SceneGraph } from '@/scene/sceneGraph';
 
 const TEST_HTML = `
   <div id="app" class="app-shell">
+    <nav id="menu-bar" class="menu-bar" role="menubar" aria-label="Application menu"></nav>
     <div class="scene-frame" data-scene-root="true"></div>
     <button id="btn-home-view" type="button" class="action-button" aria-label="Reset camera" title="Reset camera"></button>
     <aside class="tool-rail">
