@@ -3,12 +3,14 @@ import stylistic from '@stylistic/eslint-plugin';
 import prettier from 'eslint-config-prettier';
 import importPlugin from 'eslint-plugin-import';
 import prettierPlugin from 'eslint-plugin-prettier';
+import litPlugin from 'eslint-plugin-lit';
 import tseslint from 'typescript-eslint';
 
 export default tseslint.config(
     eslint.configs.recommended,
     ...tseslint.configs.strictTypeChecked,
     prettier,
+    litPlugin.configs['flat/recommended'],
     {
         files: ['**/*.{ts,tsx}'],
         plugins: {
