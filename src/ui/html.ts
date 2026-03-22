@@ -20,7 +20,6 @@ export function renderTo(
   };
 
   const unsubscribe = stateSource.onChange(update);
-
   update();
 
   return {

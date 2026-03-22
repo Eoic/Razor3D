@@ -1,8 +1,8 @@
 import type { EditorTool } from './types';
 
-import type { SlicerViewer } from '@/scene/createSlicerViewer';
+import type { Viewer } from '@/scene/createViewer';
 
-export function createWireframeTool(viewer: SlicerViewer): EditorTool {
+export function createWireframeTool(viewer: Viewer): EditorTool {
   return {
     buttonId: 'tool-wireframe',
     onActivate(): void {

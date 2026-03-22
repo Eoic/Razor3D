@@ -1,7 +1,7 @@
 import { Group } from 'three';
 import { describe, expect, it, vi } from 'vitest';
 
-import { mountSlicerApp } from '@/app/mountSlicerApp';
+import { mountApp } from '@/app/mountApp';
 import { SceneGraph } from '@/scene/sceneGraph';
 
 const TEST_HTML = `
@@ -43,11 +43,11 @@ function setup(): {
     throw new Error('Missing test root');
   }
 
-  const app = mountSlicerApp(root, { createViewer });
+  const app = mountApp(root, { createViewer });
   return { app, setViewMode, resetCamera, dispose, sceneGraph };
 }
 
-describe('mountSlicerApp', () => {
+describe('mountApp', () => {
   it('wires up the viewer and toggles wireframe mode on and off', () => {
     const { app, setViewMode, dispose } = setup();
 

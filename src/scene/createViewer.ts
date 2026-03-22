@@ -19,13 +19,13 @@ import { SceneGraph } from './sceneGraph';
 import { getTheme, onThemeChange } from '@/theme/themeColors';
 import type { Disposable } from '@/types/disposable';
 
-export interface SlicerViewer extends Disposable {
+export interface Viewer extends Disposable {
   setViewMode(viewMode: ModelViewMode): void;
   resetCamera(): void;
   readonly sceneGraph: SceneGraph;
 }
 
-export function createSlicerViewer(container: HTMLElement): SlicerViewer {
+export function createViewer(container: HTMLElement): Viewer {
   const theme = getTheme();
 
   const renderer = new WebGLRenderer({

@@ -1,9 +1,9 @@
 {
-  "name": "slicer",
+  "name": "razor3d",
   "private": true,
   "version": "1.0.0",
   "type": "module",
-  "description": "Three.js application starter for Slicer.",
+  "description": "Three.js application starter for Razor3D.",
   "keywords": [
     "three",
     "threejs",

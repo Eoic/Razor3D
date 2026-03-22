@@ -1,6 +1,6 @@
 import type { SceneGraph, SceneNode } from '@/scene/sceneGraph';
 import type { Disposable } from '@/types/disposable';
-import { html, repeat, renderTo } from '@/ui/html';
+import { html, renderTo, repeat } from '@/ui/html';
 
 export function createSceneTreePanel(container: HTMLUListElement, sceneGraph: SceneGraph): Disposable {
   return renderTo(
@@ -34,8 +34,8 @@ function treeItem(node: SceneNode, selectedId: string | null, sceneGraph: SceneG
       aria-label=${node.visible ? 'Hide' : 'Show'}
       title=${node.visible ? 'Hide' : 'Show'}
       data-hidden=${String(!node.visible)}
-      @click=${(e: Event) => {
-        e.stopPropagation();
+      @click=${(event: Event) => {
+        event.stopPropagation();
         sceneGraph.setVisible(node.id, !node.visible);
       }}
     >
@@ -46,11 +46,11 @@ function treeItem(node: SceneNode, selectedId: string | null, sceneGraph: SceneG
       class="scene-tree__color"
       .value=${node.color}
       title="Object color"
-      @input=${(e: Event) => {
-        sceneGraph.setColor(node.id, (e.target as HTMLInputElement).value);
+      @input=${(event: Event) => {
+        sceneGraph.setColor(node.id, (event.target as HTMLInputElement).value);
       }}
-      @click=${(e: Event) => {
-        e.stopPropagation();
+      @click=${(event: Event) => {
+        event.stopPropagation();
       }}
     />
   </li>`;

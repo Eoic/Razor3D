@@ -1,25 +1,23 @@
-import { createSlicerViewer } from '@/scene/createSlicerViewer';
-import type { SlicerViewer } from '@/scene/createSlicerViewer';
+import { createViewer, type Viewer } from '@/scene/createViewer';
 import { ToolRegistry } from '@/tools/registry';
 import { createThemeToggleTool } from '@/tools/themeToggleTool';
 import { createWireframeTool } from '@/tools/wireframeTool';
 import type { Disposable } from '@/types/disposable';
 import { createSceneTreePanel } from '@/ui/sceneTreePanel';
 
-interface MountSlicerAppOptions {
-  createViewer?: (container: HTMLElement) => SlicerViewer;
+interface MountOptions {
+  createViewer?: (container: HTMLElement) => Viewer;
 }
 
-export function mountSlicerApp(root: HTMLElement, options: MountSlicerAppOptions = {}): Disposable {
+export function mountApp(root: HTMLElement, options: MountOptions = {}): Disposable {
   const viewport = root.querySelector<HTMLElement>('[data-scene-root]');
 
   if (!viewport) {
     throw new Error('Missing [data-scene-root] element inside #app.');
   }
 
-  const createViewer = options.createViewer ?? createSlicerViewer;
-  const viewer = createViewer(viewport);
-
+  const viewerFactory = options.createViewer ?? createViewer;
+  const viewer = viewerFactory(viewport);
   const registry = new ToolRegistry();
   registry.register(createWireframeTool(viewer));
   registry.register(createThemeToggleTool());
@@ -28,6 +26,7 @@ export function mountSlicerApp(root: HTMLElement, options: MountSlicerAppOptions
   const onHomeClick = (): void => {
     viewer.resetCamera();
   };
+
   homeButton?.addEventListener('click', onHomeClick);
 
   const sceneTreeList = root.querySelector<HTMLUListElement>('.scene-tree__list');
