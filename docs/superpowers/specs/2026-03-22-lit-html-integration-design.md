@@ -17,14 +17,27 @@ Adopt `lit-html` (standalone, ~3.2KB gzip) for declarative HTML templating. No f
 
 Shared rendering utility that:
 
-- Re-exports `html`, `nothing`, `render` from `lit-html`.
-- Exports a `renderTo(container, stateSource, templateFn)` helper:
-  - Subscribes to a state source's `onChange` callback.
-  - Calls lit-html `render()` with the template function's result on each change.
-  - Does an initial render immediately.
-  - Returns a `Disposable` that unsubscribes on `dispose()`.
+- Re-exports `html`, `render` from `lit-html`.
+- Re-exports `repeat` from `lit-html/directives/repeat.js`.
+- Exports a `renderTo()` helper with the following signature:
 
-The state source interface is any object with an `onChange(callback): unsubscribe` method, matching the existing `SceneGraph` pattern.
+```ts
+interface StateSource {
+  onChange(callback: () => void): () => void;
+}
+
+function renderTo(
+  container: HTMLElement,
+  stateSource: StateSource,
+  templateFn: () => TemplateResult
+): Disposable;
+```
+
+Behavior:
+- Subscribes to the state source's `onChange` callback. The callback argument is ignored — `templateFn` re-reads current state on each call.
+- Calls lit-html `render()` with the template function's result on each change.
+- Does an initial render immediately.
+- Returns a `Disposable` that unsubscribes on `dispose()`.
 
 ## Modified file: `src/ui/sceneTreePanel.ts`
 
@@ -36,30 +49,48 @@ Rewritten to use lit-html templates:
 - Uses `renderTo()` helper for lifecycle wiring.
 - Public API unchanged: `createSceneTreePanel(container, sceneGraph): Disposable`.
 
+### Nested tree rendering
+
+`SceneNode` has a `children` property, but the current UI renders only top-level nodes from `sceneGraph.getNodes()`. This behavior is preserved — nested tree rendering is out of scope for this change.
+
 ### Template structure
 
 ```ts
 function treeItem(node: SceneNode, selectedId: string | null, sceneGraph: SceneGraph) {
   return html`
     <li class="scene-tree__item" role="treeitem"
-        data-node-id=${node.id} data-selected=${node.id === selectedId}
+        data-node-id=${node.id} data-selected=${String(node.id === selectedId)}
         @click=${() => sceneGraph.select(sceneGraph.getSelectedId() === node.id ? null : node.id)}>
       <i class="scene-tree__item-icon fa-solid fa-cube" aria-hidden="true"></i>
       <span class="scene-tree__label">${node.label}</span>
       <button type="button" class="scene-tree__visibility"
+              aria-label=${node.visible ? 'Hide' : 'Show'}
+              title=${node.visible ? 'Hide' : 'Show'}
+              data-hidden=${String(!node.visible)}
               @click=${(e: Event) => { e.stopPropagation(); sceneGraph.setVisible(node.id, !node.visible); }}>
         <i class=${node.visible ? 'fa-solid fa-eye' : 'fa-solid fa-eye-slash'}></i>
       </button>
       <input type="color" class="scene-tree__color" .value=${node.color}
+             title="Object color"
              @input=${(e: Event) => sceneGraph.setColor(node.id, (e.target as HTMLInputElement).value)}
              @click=${(e: Event) => e.stopPropagation()}>
     </li>`;
 }
 ```
 
+### `data-selected` binding
+
+CSS selectors use `[data-selected='true']`, so values must be strings `"true"` / `"false"` — not boolean attribute presence. Use `String(...)` to ensure string coercion.
+
 ## ESLint config
 
-Add `eslint-plugin-lit` to the existing ESLint flat config with recommended rules.
+Add `eslint-plugin-lit` to the existing ESLint 9 flat config using the flat config format (not legacy `extends`), with recommended rules.
+
+## Testing
+
+- Existing tests in `tests/app.test.ts` must continue to pass without modification.
+- lit-html works under JSDOM (used by Vitest) — `jsdom@24` supports `<template>` elements.
+- Verify during implementation by running `npm test`.
 
 ## What stays the same
 
