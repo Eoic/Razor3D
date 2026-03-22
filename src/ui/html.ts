@@ -13,7 +13,7 @@ export interface StateSource {
 export function renderTo(
   container: HTMLElement,
   stateSource: StateSource,
-  templateFn: () => TemplateResult,
+  templateFn: () => TemplateResult
 ): Disposable {
   const update = () => {
     render(templateFn(), container);

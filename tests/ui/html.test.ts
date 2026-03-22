@@ -58,11 +58,11 @@ describe('renderTo', () => {
     const container = document.createElement('div');
     const source = createMockStateSource();
 
-    const { dispose } = renderTo(container, source, () => html`<p>test</p>`);
+    const result = renderTo(container, source, () => html`<p>test</p>`);
 
     expect(source.listenerCount).toBe(1);
 
-    dispose();
+    result.dispose();
 
     expect(source.listenerCount).toBe(0);
   });
