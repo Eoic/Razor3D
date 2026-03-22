@@ -58,32 +58,7 @@ export function createSceneTreePanel(container: HTMLUListElement, sceneGraph: Sc
     }
   }
 
-  const unsubscribe = sceneGraph.onChange(event => {
-    switch (event.type) {
-      case 'node-added':
-      case 'node-removed':
-        render();
-        break;
-      case 'selection-changed':
-        {
-          const selectedId = event.data.selectedId as string | null;
-          const uiNode = container.querySelector<HTMLElement>(`.scene-tree__item[data-node-id="${selectedId}"]`);
-
-          if (!uiNode) {
-            container.querySelectorAll('.scene-tree__item').forEach(item => {
-              item.setAttribute('data-selected', 'false');
-            });
-
-            return;
-          }
-
-          uiNode.setAttribute('data-selected', 'true');
-        }
-        break;
-      // case 'visibility-changed':
-      // case 'color-changed':
-    }
-  });
+  const unsubscribe = sceneGraph.onChange(render);
 
   render();
 
