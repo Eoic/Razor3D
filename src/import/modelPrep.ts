@@ -92,6 +92,8 @@ export function createPreparedMesh(loadedGeometry: BufferGeometry): {
   const wireframeMaterial = createWireframeMaterial();
   const mesh = new Mesh<BufferGeometry, Material>(geometry, solidMaterial);
   mesh.position.y = scaledHeight * 0.5;
+  mesh.userData.solidMaterial = solidMaterial;
+  mesh.userData.wireframeMaterial = wireframeMaterial;
 
   return { mesh, solidMaterial, wireframeMaterial };
 }

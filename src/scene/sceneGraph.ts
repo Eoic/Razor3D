@@ -23,7 +23,7 @@ export class SceneGraph {
   private nodes: SceneNode[] = [];
   private selectedId: string | null = null;
   private listeners = new Set<(event: SceneChangeEvent) => void>();
-  private selectionOutlines = new WeakMap<Object3D, Mesh>();
+  private selectionOutlines = new Map<string, Mesh[]>();
 
   addNode(node: SceneNode): void {
     this.nodes.push(node);
@@ -143,57 +143,72 @@ export class SceneGraph {
   }
 
   private applyColor(node: SceneNode): void {
-    const obj = node.object3D;
+    node.object3D.traverse(child => {
+      if (child instanceof Mesh && child.name !== SELECTION_OUTLINE_NAME) {
+        const solidMat = child.userData.solidMaterial as MeshPhysicalMaterial | undefined;
 
-    if (obj instanceof Mesh && obj.material instanceof MeshPhysicalMaterial) {
-      obj.material.color.set(node.color);
-    }
+        if (solidMat) {
+          solidMat.color.set(node.color);
+        } else if (child.material instanceof MeshPhysicalMaterial) {
+          child.material.color.set(node.color);
+        }
+      }
+    });
   }
 
   private applyHighlight(node: SceneNode): void {
-    const sceneObject = node.object3D;
+    const existing = this.selectionOutlines.get(node.id);
 
-    if (sceneObject instanceof Mesh) {
-      const existingOutline = this.selectionOutlines.get(sceneObject);
-
-      if (existingOutline) {
-        existingOutline.visible = true;
-        return;
+    if (existing) {
+      for (const outline of existing) {
+        outline.visible = true;
       }
 
-      const outline = new Mesh(
-        sceneObject.geometry,
-        new MeshBasicMaterial({
-          color: SELECTION_OUTLINE_COLOR,
-          side: BackSide,
-          depthWrite: false,
-          toneMapped: false,
-        })
-      );
-
-      outline.name = SELECTION_OUTLINE_NAME;
-      outline.renderOrder = 1;
-      outline.scale.setScalar(SELECTION_OUTLINE_SCALE);
-      outline.raycast = () => null;
-      sceneObject.add(outline);
-      // eslint-disable-next-line @typescript-eslint/no-unsafe-argument
-      this.selectionOutlines.set(sceneObject, outline);
+      return;
     }
+
+    const outlines: Mesh[] = [];
+
+    node.object3D.traverse(child => {
+      if (child instanceof Mesh && child.name !== SELECTION_OUTLINE_NAME) {
+        const outline = new Mesh(
+          child.geometry,
+          new MeshBasicMaterial({
+            color: SELECTION_OUTLINE_COLOR,
+            side: BackSide,
+            depthWrite: false,
+            toneMapped: false,
+          })
+        );
+
+        outline.name = SELECTION_OUTLINE_NAME;
+        outline.renderOrder = 1;
+        outline.scale.setScalar(SELECTION_OUTLINE_SCALE);
+        outline.raycast = () => null;
+        child.add(outline);
+        outlines.push(outline);
+      }
+    });
+
+    this.selectionOutlines.set(node.id, outlines);
   }
 
   private removeHighlight(node: SceneNode): void {
-    const sceneObject = node.object3D;
-    const outline = this.selectionOutlines.get(sceneObject);
+    const outlines = this.selectionOutlines.get(node.id);
 
-    if (outline && sceneObject instanceof Mesh) {
+    if (!outlines) {
+      return;
+    }
+
+    for (const outline of outlines) {
       outline.removeFromParent();
 
       if (outline.material instanceof MeshBasicMaterial) {
         outline.material.dispose();
       }
-
-      this.selectionOutlines.delete(sceneObject);
     }
+
+    this.selectionOutlines.delete(node.id);
   }
 
   private notify(event: SceneChangeEvent): void {

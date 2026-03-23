@@ -4,6 +4,7 @@ import {
   DirectionalLight,
   Fog,
   HemisphereLight,
+  Mesh,
   PerspectiveCamera,
   Scene,
   SRGBColorSpace,
@@ -127,8 +128,17 @@ export function createViewer(container: HTMLElement): Viewer {
       renderer.dispose();
       renderer.domElement.remove();
     },
-    setViewMode(_viewMode: ModelViewMode): void {
-      // No-op: per-model view modes will be added later.
+    setViewMode(viewMode: ModelViewMode): void {
+      for (const node of sceneGraph.getNodes()) {
+        node.object3D.traverse(child => {
+          if (child instanceof Mesh && child.userData.solidMaterial != null && child.userData.wireframeMaterial != null) {
+            child.material =
+              viewMode === 'wireframe'
+                ? (child.userData.wireframeMaterial as typeof child.material)
+                : (child.userData.solidMaterial as typeof child.material);
+          }
+        });
+      }
     },
     resetCamera(): void {
       camera.position.set(6.5, 4.6, 6.5);
