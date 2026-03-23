@@ -8,9 +8,14 @@ import {
   PerspectiveCamera,
   Scene,
   SRGBColorSpace,
+  Vector2,
   WebGLRenderer,
 } from 'three';
 import { OrbitControls } from 'three/examples/jsm/controls/OrbitControls.js';
+import { EffectComposer } from 'three/examples/jsm/postprocessing/EffectComposer.js';
+import { OutlinePass } from 'three/examples/jsm/postprocessing/OutlinePass.js';
+import { OutputPass } from 'three/examples/jsm/postprocessing/OutputPass.js';
+import { RenderPass } from 'three/examples/jsm/postprocessing/RenderPass.js';
 
 import { createInfiniteGrid } from './createInfiniteGrid';
 import type { ModelViewMode } from './modelViewMode';
@@ -77,6 +82,34 @@ export function createViewer(container: HTMLElement): Viewer {
 
   const fog = scene.fog;
 
+  // ── Post-processing ───────────────────────────────────────────────────
+
+  const composer = new EffectComposer(renderer);
+  composer.addPass(new RenderPass(scene, camera));
+
+  const outlinePass = new OutlinePass(new Vector2(1, 1), scene, camera);
+  outlinePass.edgeStrength = 5;
+  outlinePass.edgeGlow = 0;
+  outlinePass.edgeThickness = 2;
+  outlinePass.visibleEdgeColor.set('#4488ff');
+  outlinePass.hiddenEdgeColor.set('#1a3366');
+  outlinePass.pulsePeriod = 0;
+  composer.addPass(outlinePass);
+
+  composer.addPass(new OutputPass());
+
+  // ── Selection → OutlinePass wiring ────────────────────────────────────
+
+  const unsubscribeSelection = sceneGraph.onChange(event => {
+    if (event.type === 'selection-changed' || event.type === 'node-removed') {
+      const selectedId = sceneGraph.getSelectedId();
+      const node = selectedId != null ? sceneGraph.getNodes().find(n => n.id === selectedId) : undefined;
+      outlinePass.selectedObjects = node ? [node.object3D] : [];
+    }
+  });
+
+  // ── Theme ─────────────────────────────────────────────────────────────
+
   const unsubscribeTheme = onThemeChange(nextTheme => {
     (scene.background as Color).set(nextTheme.sceneBackground);
     fog.color.set(nextTheme.sceneFog);
@@ -94,6 +127,8 @@ export function createViewer(container: HTMLElement): Viewer {
     rimLight.intensity = nextTheme.rimLightIntensity;
   });
 
+  // ── Resize & render loop ──────────────────────────────────────────────
+
   let animationFrameId = 0;
 
   const resize = (): void => {
@@ -103,6 +138,7 @@ export function createViewer(container: HTMLElement): Viewer {
     camera.aspect = width / height;
     camera.updateProjectionMatrix();
     renderer.setSize(width, height, false);
+    composer.setSize(width, height);
   };
 
   window.addEventListener('resize', resize);
@@ -111,7 +147,7 @@ export function createViewer(container: HTMLElement): Viewer {
   const render = (_time: number): void => {
     controls.update();
     grid.update(camera);
-    renderer.render(scene, camera);
+    composer.render();
 
     animationFrameId = window.requestAnimationFrame(render);
   };
@@ -121,7 +157,9 @@ export function createViewer(container: HTMLElement): Viewer {
   return {
     dispose(): void {
       window.cancelAnimationFrame(animationFrameId);
+      unsubscribeSelection();
       unsubscribeTheme();
+      composer.dispose();
       grid.dispose();
       controls.dispose();
       window.removeEventListener('resize', resize);
@@ -131,11 +169,12 @@ export function createViewer(container: HTMLElement): Viewer {
     setViewMode(viewMode: ModelViewMode): void {
       for (const node of sceneGraph.getNodes()) {
         node.object3D.traverse(child => {
-          if (child instanceof Mesh && child.userData.solidMaterial != null && child.userData.wireframeMaterial != null) {
-            child.material =
-              viewMode === 'wireframe'
-                ? (child.userData.wireframeMaterial as typeof child.material)
-                : (child.userData.solidMaterial as typeof child.material);
+          if (
+            child instanceof Mesh &&
+            child.userData.solidMaterial != null &&
+            child.userData.wireframeMaterial != null
+          ) {
+            child.material = viewMode === 'wireframe' ? child.userData.wireframeMaterial : child.userData.solidMaterial;
           }
         });
       }
